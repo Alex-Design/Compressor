@@ -10,27 +10,31 @@
 
 $compressor = new Compressor();
 
-if (!array_key_exists(1, $argv)) {
-    $compressor->readFile();
-} else {
-    $compressor->readFile($argv[1]);
+$result = scandir('FilesToCompress');
+$noDotsArray = array_slice($result, 2); 
+
+foreach ($noDotsArray as $individualFile) {
+    if (!array_key_exists(1, $argv)) {
+        $compressor->readFile($individualFile);
+    } else {
+        $compressor->readFile($individualFile, $argv[1]);
+    }
 }
 
 class Compressor {
     
-    public function readFile($argument = null) {
+    public function readFile($fileName, $argument = null) {
         
-        $fileToReadName = 'test.txt';
-        $fileOutputName = "result.gz";
+        $fileOutputName = $fileName . '.gz';
         
-        $fileToReadContents = $this->readFileContent($fileToReadName);
+        $fileToReadContents = $this->readFileContent('FilesToCompress/' . $fileName);
         
-        if (file_exists($fileOutputName)) {
+        if (file_exists('CompressedFiles/' . $fileOutputName) == true) {
             if ($argument == 'overwrite') {
                 $this->createAndWriteFile($fileToReadContents, $fileOutputName);
             } else {
-                print_r(PHP_EOL . 'File already exists.'. PHP_EOL);
-                print_r('Please run "php batchCompressor.php overwrite" to overwrite it.' . PHP_EOL . PHP_EOL);
+                print_r(PHP_EOL . 'File: ' . $fileOutputName .  ' already exists.'. PHP_EOL);
+                print_r('Please run "php batchCompressor.php overwrite" to overwrite.' . PHP_EOL . PHP_EOL);
             }
         } else {
             $this->createAndWriteFile($fileToReadContents, $fileOutputName);
@@ -45,7 +49,7 @@ class Compressor {
     
     public function createAndWriteFile($data, $fileOutputName) {
         $gzData = gzencode($data, 9);
-        $filePath = fopen($fileOutputName, "w");
+        $filePath = fopen('CompressedFiles/' . $fileOutputName, "w");
         $this->writeFile($filePath, $gzData);
     }
     
