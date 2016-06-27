@@ -15,7 +15,7 @@ _To use, type: **php compressor.php overwrite** into the terminal._
 
 ## Upcoming Features
 - Recursion
-- Testing to check suitability for reading multiple different types of files (only text-based files ae currently supported eg .js, .php, .xml, .txt, etc)
+- Testing to check suitability for reading multiple different types of files (only text-based files are currently supported eg .js, .php, .xml, .txt, etc)
 
 ## Contributing
 - If you have any contributions to make, please leave a comment somewhere or make a pull request, thanks.
