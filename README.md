@@ -4,7 +4,7 @@ Reads a text-based (.txt, .xml, .php, etc) file as a string, compresses it and o
 ## Usage
 - Download the repository by clicking "clone or download" on the top right, and place it wherever you like.
 - Next, open the terminal and type **cd yourfilelocation** where yourfilelocation is where the repository is located.
-- Place the (text-oriented) files you wish to compress, into the FilesToCompress folder.
+- Place the (text-oriented) files you wish to compress, into the FilesToCompress folder. (Files within subfolders are ok.)
 - Finally, type **php compressor.php** into the terminal and press enter.
 
 _Optional argument: overwrite_
