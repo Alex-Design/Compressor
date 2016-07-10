@@ -15,6 +15,26 @@ $compressor->scanRecursively($currentDirectoryName, $argv);
 
 class Compressor {
     
+    public $fileToCompress;
+    public $outputFileName;
+    
+    public function __construct($fileToCompress, $outputFileName = NULL) 
+    {
+        $this->fileToCompress = $fileToCompress;
+        $this->outputFileName = $outputFileName;
+        
+        if ($outputFileName != NULL) {
+            $this->compressFile($fileToCompress, $outputFileName);
+        } else {
+            $this->readSpecificFile($fileToCompress);
+        }
+    }
+    
+    public function compressFile($fileName, $outputFileName) {
+        $fileContents = $this->readFileContent($fileName);
+        $this->createAndWriteFile($fileContents, $outputFileName);
+    }
+    
     public function scanRecursively($currentDirectoryName, $argv = []) {
         
         $result = scandir($currentDirectoryName);
@@ -66,14 +86,26 @@ class Compressor {
         
     }
     
-    public function readFileContent($fileToRead, $currentDirectoryName) {
+    public function readSpecificFile($fileToRead) {
+        $fileContents = file_get_contents($fileToRead, 'r');
+        return $fileContents;
+    }
+    
+    public function readFileContent($fileToRead, $currentDirectoryName = NULL) {
         $fileContents = file_get_contents($currentDirectoryName . '/' . $fileToRead, 'r');
         return $fileContents;
     }
     
-    public function createAndWriteFile($data, $fileOutputName) {
+    public function createAndWriteFile($data, $fileOutputName, $outputLocation = NULL) {
+        
         $gzData = gzencode($data, 9);
-        $filePath = fopen('CompressedFiles/' . $fileOutputName, "w");
+        
+        if ($outputLocation == NULL) {
+            $filePath = fopen('CompressedFiles/' . $fileOutputName, "w");   
+        } else {
+            $filePath = fopen($outputLocation . '/' . $fileOutputName, "w"); 
+        }
+        
         $this->writeFile($filePath, $gzData);
     }
     
