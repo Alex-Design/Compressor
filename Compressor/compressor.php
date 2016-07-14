@@ -1,21 +1,34 @@
 <?php
-
-/* 
- * php compressor.php [overwrite]
- */
-
 /*
  * Reads a file as a string, compresses it and outputs the result.
  */
-
-$currentDirectoryName = 'FilesToCompress';
-
-$compressor = new Compressor();
-$compressor->scanRecursively($currentDirectoryName, $argv);
-
 class Compressor {
     
-    public function scanRecursively($currentDirectoryName, $argv = []) {
+    public $fileToCompress;
+    public $outputFileName;
+    public $currentDirectoryName = 'FilesToCompress'; 
+    
+    public function __construct($fileToCompress = NULL, $outputFileName = NULL) 
+    {
+        $this->fileToCompress = $fileToCompress;
+        $this->outputFileName = $outputFileName;
+        
+        print_r('The file ' . $fileToCompress . ' will now be compressed.');
+        
+        if (!$this->outputFileName == NULL && !$this->fileToCompress == NULL) {
+            $fileContents = $this->readSpecificFile($fileToCompress);
+            $this->createAndWriteFile($fileContents, $fileToCompress);
+        } else {
+            $this->compressFile($fileToCompress, $outputFileName);
+        }
+    }
+    
+    public function compressFile($fileName, $outputFileName) {
+        $fileContents = $this->readFileContent($fileName);
+        $this->createAndWriteFile($fileContents, $outputFileName);
+    }
+    
+    private function scanRecursively($currentDirectoryName, $argv = []) {
         
         $result = scandir($currentDirectoryName);
         $noDotsArray = array_slice($result, 2);
@@ -38,17 +51,17 @@ class Compressor {
         }
     }
     
-    public function amendDirectoryName ($currentDirectoryName, $directoryAddition) {
+    private function amendDirectoryName ($currentDirectoryName, $directoryAddition) {
         $newDirectoryName = $currentDirectoryName . '/' . $directoryAddition;
         return $newDirectoryName;
     }
     
-    public function scanDirectory ($directoryName) {
+    private function scanDirectory ($directoryName) {
         $directoryContents = scandir($directoryName);
         return $directoryContents;
     }
     
-    public function readFile($fileName, $currentDirectoryName, $argument = null) {
+    private function readFile($fileName, $currentDirectoryName, $argument = null) {
         
         $fileOutputName = $fileName . '.gz';
         $fileToReadContents = $this->readFileContent($fileName, $currentDirectoryName);
@@ -66,18 +79,30 @@ class Compressor {
         
     }
     
-    public function readFileContent($fileToRead, $currentDirectoryName) {
+    public function readSpecificFile($fileToRead) {
+        $fileContents = file_get_contents($fileToRead, 'r');
+        return $fileContents;
+    }
+    
+    private function readFileContent($fileToRead, $currentDirectoryName = NULL) {
         $fileContents = file_get_contents($currentDirectoryName . '/' . $fileToRead, 'r');
         return $fileContents;
     }
     
-    public function createAndWriteFile($data, $fileOutputName) {
+    private function createAndWriteFile($data, $fileOutputName, $outputLocation = NULL) {
+        
         $gzData = gzencode($data, 9);
-        $filePath = fopen('CompressedFiles/' . $fileOutputName, "w");
+        
+        if ($outputLocation == NULL) {
+            $filePath = fopen('CompressedFiles/' . $fileOutputName . '.gz', "w");   
+        } else {
+            $filePath = fopen($outputLocation . '/' . $fileOutputName . '.gz', "w"); 
+        }
+        
         $this->writeFile($filePath, $gzData);
     }
     
-    public function writeFile ($filePath, $gzData) {
+    private function writeFile($filePath, $gzData) {
         fwrite($filePath, $gzData);
         fclose($filePath);
     }
